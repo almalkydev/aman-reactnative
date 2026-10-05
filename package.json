@@ -1,0 +1,18 @@
+{
+  "name": "aman",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "server": "npm --prefix server run dev",
+    "mobile": "npm --prefix mobile start",
+    "check": "npm --prefix server run check && npm --prefix mobile run check",
+    "seed": "npm --prefix server run seed",
+    "test:e2e": "playwright test",
+    "format": "prettier --write mobile/app mobile/components mobile/lib server/src server/db/setup.ts server/test tests playwright.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "prettier": "^3.9.9"
+  },
+  "packageManager": "npm@11.11.0"
+}

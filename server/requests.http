@@ -1,0 +1,43 @@
+@base = http://localhost:4000
+@token = paste-login-token-here
+
+### Login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"email":"worker@aman.demo","password":"AmanDemo2026!"}
+
+### Profile
+GET {{base}}/me
+Authorization: Bearer {{token}}
+
+### Dashboard
+GET {{base}}/dashboard
+Authorization: Bearer {{token}}
+
+### Templates
+GET {{base}}/templates
+Authorization: Bearer {{token}}
+
+### Questions
+GET {{base}}/templates/1/questions
+Authorization: Bearer {{token}}
+
+### Sites
+GET {{base}}/sites
+Authorization: Bearer {{token}}
+
+### Inspections
+GET {{base}}/inspections?status=failed
+Authorization: Bearer {{token}}
+
+### Incidents
+GET {{base}}/incidents?severity=high
+Authorization: Bearer {{token}}
+
+### AI triage
+POST {{base}}/incidents/suggest
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"description":"Sample observation: visible seepage at pump flange."}

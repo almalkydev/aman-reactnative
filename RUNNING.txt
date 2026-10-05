@@ -1,0 +1,49 @@
+AMAN / أمان — sample-data safety reporting demo
+
+Requirements: Node.js 22+, npm, PostgreSQL (Neon supported).
+
+Install:
+  npm ci
+  npm --prefix server ci
+  npm --prefix mobile ci
+
+Copy server/.env.example to server/.env and enter DATABASE_URL and JWT_SECRET.
+Copy mobile/.env.example to mobile/.env and enter EXPO_PUBLIC_API_URL.
+The database credential stays on the server. Never use an EXPO_PUBLIC database URL.
+
+Initialize:
+  npm run seed
+
+Run in separate terminals:
+  npm run server
+  npm run mobile
+
+Browser preview:
+  npm --prefix mobile run web
+
+Demo login (all use password AmanDemo2026!):
+  worker@aman.demo
+  supervisor@aman.demo
+  admin@aman.demo
+
+On a physical phone use the computer's LAN IP for the API URL; localhost points
+at the phone. Android emulator: http://10.0.2.2:4000. Expo SDK 54 is pinned.
+Use a compatible Expo Go client or an SDK 54 development build.
+
+Checks:
+  npm run check
+  npm --prefix server test
+  npm run test:e2e       (API and Metro must already be running; uses Chrome)
+
+Optional AI: set ANTHROPIC_API_KEY and AI_MODEL on the server. Without a key,
+the app reports a friendly unavailable message and lets you continue manually.
+
+Native uses SQLite, SecureStore, Skia and Lottie. Browser preview uses IndexedDB,
+memory-only tokens and SVG. Browser refresh requires signing in again.
+Reports save locally before syncing. Photos upload first. UUIDs prevent retries
+from creating duplicates. Reconnect, app resume and pull-to-refresh trigger sync.
+
+Demo only: no real company data. Not an emergency response system.
+Native device tests and live AI provider verification still require a device/key.
+See DEPENDENCY-REVIEW.txt for remaining mobile build-tool advisories.
+Markdown documentation and AI workspace files are intentionally Git-ignored.

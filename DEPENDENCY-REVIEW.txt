@@ -1,0 +1,43 @@
+Review date: 2026-10-05. Recheck no later than 2026-10-19 and before deployment.
+
+Install boundaries: root (verification), server, mobile. Each owns an npm lockfile.
+All installations use ignore-scripts=true. No dependency lifecycle script was
+approved or executed. Optional native build scripts may need targeted review
+when moving from Expo Go/bundle export to a custom native build.
+
+Server and root audits: no known vulnerabilities at review time.
+Registry-signature verification: server 125 packages verified (7 attestations);
+mobile 735 packages verified (155 attestations). No signature failures reported.
+
+Mobile compatible fixes:
+- postcss 8.5.28: fixes source-map traversal and CSS stringification advisories.
+- decode-uri-component 0.5.0: fixes malformed-input decoding denial of service.
+
+Remaining transitive mobile toolchain advisories:
+- braces <=3.0.3 (GHSA-vfj7-8cjw-p6xm), high, no patched version available.
+  Used by build-time globbing (Tailwind/Metro/Jest tooling), not report payloads.
+  Only trusted repository file patterns are processed. Do not build untrusted
+  configuration. Runtime report fields never reach a glob compiler.
+- node-forge <=1.4.0 (GHSA-86w9-cpqp-85rv), high, no patched version available.
+  Used by Expo development/code-signing tooling. Aman uses no signed OTA update
+  service, and server JWT verification uses jsonwebtoken/Node crypto instead.
+  Review again before adding Expo signed updates.
+- image-size <=2.0.2 (GHSA-5p2g-fcmc-qvqq / GHSA-w3rx-r6r6-pgpr), high.
+  Metro's SDK 54 interface depends on the v1 filesystem API; the patched v2 API
+  breaks native asset bundling. Retain Expo's supported dependency until migration.
+  Only checked-in/trusted image assets go through Metro. Uploaded report photos
+  go to Express storage, not image-size. Never build untrusted image assets.
+- uuid <11.1.1 (GHSA-w5hq-g745-h8pq), moderate.
+  Expo/xcode tooling dependency; no app calls v3/v5/v6 with caller buffers.
+  Report IDs use expo-crypto.randomUUID, server IDs use Node crypto.randomUUID.
+
+The audit also reports ancestor packages affected through these dependencies.
+These warnings remain; they are not suppressed or claimed fixed. Forced major
+upgrades were not applied. The intended mitigation is restricting build inputs
+and keeping Metro local until a tested supported-SDK migration is performed.
+
+Reference advisories:
+https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
+https://github.com/advisories/GHSA-86w9-cpqp-85rv
+https://github.com/advisories/GHSA-5p2g-fcmc-qvqq
+https://github.com/advisories/GHSA-w3rx-r6r6-pgpr

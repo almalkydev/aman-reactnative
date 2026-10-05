@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Aman",
+    "slug": "aman",
+    "scheme": "aman",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aman.demo",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Attach a photo to a safety report.",
+        "NSPhotoLibraryUsageDescription": "Choose a photo for a safety report."
+      }
+    },
+    "android": {
+      "package": "com.aman.demo",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "Aman · Field safety",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose photos for a safety report.",
+          "cameraPermission": "Take photos for a safety report."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icon.png",
+          "imageWidth": 90,
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "backgroundColor": "#09090b"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "icon": "./assets/icon.png"
+  }
+}

@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root { --background: #ffffff; --foreground: #09090b; --border: #e4e4e7; --card: #ffffff; }
+  .dark { --background: #09090b; --foreground: #fafafa; --border: #27272a; --card: #0a0a0b; }
+}

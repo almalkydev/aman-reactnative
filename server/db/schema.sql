@@ -1,0 +1,14 @@
+CREATE SCHEMA IF NOT EXISTS aman;
+SET search_path TO aman, public;
+CREATE TABLE IF NOT EXISTS sites (id serial PRIMARY KEY, name text NOT NULL, location text NOT NULL);
+CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, name text NOT NULL, email text UNIQUE NOT NULL, password_hash text NOT NULL, role text NOT NULL CHECK(role IN ('worker','supervisor','admin')), site_id integer REFERENCES sites(id));
+CREATE TABLE IF NOT EXISTS templates (id serial PRIMARY KEY, name text NOT NULL, site_type text NOT NULL);
+CREATE TABLE IF NOT EXISTS questions (id serial PRIMARY KEY, template_id integer NOT NULL REFERENCES templates(id), text text NOT NULL, position integer NOT NULL, UNIQUE(template_id,position));
+CREATE TABLE IF NOT EXISTS inspections (id uuid PRIMARY KEY, template_id integer NOT NULL REFERENCES templates(id), site_id integer NOT NULL REFERENCES sites(id), user_id integer NOT NULL REFERENCES users(id), equipment_name text NOT NULL, status text NOT NULL CHECK(status IN ('in_progress','completed','failed')), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS answers (id serial PRIMARY KEY, inspection_id uuid NOT NULL REFERENCES inspections(id) ON DELETE CASCADE, question_id integer NOT NULL REFERENCES questions(id), result text NOT NULL CHECK(result IN ('pass','fail','na')), note text NOT NULL DEFAULT '', photo_url text, UNIQUE(inspection_id,question_id));
+CREATE TABLE IF NOT EXISTS incidents (id uuid PRIMARY KEY, user_id integer NOT NULL REFERENCES users(id), site_id integer NOT NULL REFERENCES sites(id), title text NOT NULL, severity text NOT NULL CHECK(severity IN ('low','medium','high','critical')), category text NOT NULL, description text NOT NULL, status text NOT NULL DEFAULT 'open' CHECK(status IN ('open','in_progress','closed')), assigned_to integer REFERENCES users(id), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS photos (id serial PRIMARY KEY, incident_id uuid NOT NULL REFERENCES incidents(id) ON DELETE CASCADE, url text NOT NULL);
+CREATE TABLE IF NOT EXISTS uploads (filename text PRIMARY KEY, user_id integer NOT NULL REFERENCES users(id), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS incident_events (id serial PRIMARY KEY, incident_id uuid NOT NULL REFERENCES incidents(id) ON DELETE CASCADE, user_id integer NOT NULL REFERENCES users(id), text text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS incidents_scope ON incidents(site_id,user_id,created_at DESC);
+CREATE INDEX IF NOT EXISTS inspections_scope ON inspections(site_id,user_id,created_at DESC);
