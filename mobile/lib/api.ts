@@ -1,9 +1,43 @@
 import { Platform } from "react-native";
+import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 
-export const API_URL = (
-  process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000"
-).replace(/\/$/, "");
+function getApiUrl() {
+  const configured = (
+    process.env.EXPO_PUBLIC_API_URL || "http://localhost:4000"
+  ).replace(/\/$/, "");
+  if (Platform.OS === "web") return configured;
+
+  try {
+    const url = new URL(configured);
+    const localHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(
+      url.hostname,
+    );
+    if (!localHost) return configured;
+
+    const hostUri = Constants.expoConfig?.hostUri;
+    if (hostUri) {
+      const host = new URL(
+        hostUri.includes("://") ? hostUri : `http://${hostUri}`,
+      ).hostname;
+      if (host && !["localhost", "127.0.0.1", "0.0.0.0"].includes(host)) {
+        url.hostname = host;
+        return url.toString().replace(/\/$/, "");
+      }
+    }
+
+    // Android's emulator routes 10.0.2.2 to the development computer.
+    if (Platform.OS === "android") {
+      url.hostname = "10.0.2.2";
+      return url.toString().replace(/\/$/, "");
+    }
+  } catch {
+    // Keep the configured URL so the network error explains what was attempted.
+  }
+  return configured;
+}
+
+export const API_URL = getApiUrl();
 let token: string | null = null;
 export async function restoreToken() {
   token =
@@ -32,17 +66,22 @@ export async function api<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(API_URL + path, {
-    ...options,
-    signal: options.signal || AbortSignal.timeout(20000),
-    headers: {
-      ...(options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(API_URL + path, {
+      ...options,
+      signal: options.signal || AbortSignal.timeout(20000),
+      headers: {
+        ...(options.body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+  } catch {
+    throw new ApiError(`Could not reach the Aman server at ${API_URL}.`, 0);
+  }
   const data = await response
     .json()
     .catch(() => ({ error: "Server response could not be read." }));

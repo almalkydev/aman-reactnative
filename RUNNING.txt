@@ -26,9 +26,13 @@ Demo login (all use password AmanDemo2026!):
   supervisor@aman.demo
   admin@aman.demo
 
-On a physical phone use the computer's LAN IP for the API URL; localhost points
-at the phone. Android emulator: http://10.0.2.2:4000. Expo SDK 54 is pinned.
-Use a compatible Expo Go client or an SDK 54 development build.
+In the native Expo app, the default localhost URL is redirected to the host
+address advertised by Expo; keep the phone and computer on the same network and
+allow inbound port 4000 through the computer firewall. Android emulator falls
+back to http://10.0.2.2:4000. If Expo cannot advertise a LAN address, set
+EXPO_PUBLIC_API_URL in mobile/.env to the computer's LAN IP. Browser preview
+continues using localhost. Expo SDK 54 is pinned; use a compatible Expo Go
+client or an SDK 54 development build.
 
 Checks:
   npm run check
